@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true,
     required: true,
-    unique: true, 
+    unique: true,
   },
   email: {
     type: String,
@@ -21,14 +21,17 @@ const UserSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+
   tax_id: {
     type: String,
     required: true,
   },
+
   business_licence: {
     type: String,
     required: true,
   },
+
   phone_number: {
     type: String,
     required: true,
@@ -41,7 +44,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 8, 
+    minlength: 8,
   },
   billing_address: {
     type: String,
@@ -70,7 +73,7 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-
+// Remove password from JSON responses
 UserSchema.set("toJSON", {
   transform: (doc, ret) => {
     delete ret.password;
@@ -78,11 +81,12 @@ UserSchema.set("toJSON", {
   },
 });
 
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
+// Hash password before saving
+// UserSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) return next();
+//   this.password = await bcrypt.hash(this.password, 10);
+//   next();
+// });
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 

@@ -19,10 +19,6 @@ const BrandSchema = new mongoose.Schema(
       required: [true, "Brand Description is Required"],
     },
     brandWebsite: String,
-    brandImage: {
-      type: String,
-      required: [true, "Brand image/logo is Required "],
-    },
   },
   { timestamps: true }
 );

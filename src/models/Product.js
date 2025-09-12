@@ -22,7 +22,7 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Product Price is required!"],
     },
     productImage: {
-      type: [String],
+      type: [String], 
       required: [true, "Product image/logo is required!"],
     },
     productQuantity: {
@@ -38,8 +38,7 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-ProductSchema.index({ productName: 1 });
-
+// Automatically generate slug from productName
 ProductSchema.pre("validate", function (next) {
   if (this.productName) {
     this.slug = slugify(this.productName, { lower: true, strict: true });

@@ -5,7 +5,7 @@ import Order from "../../../models/Order";
 export async function PUT(req) {
   await dbConnection();
   try {
-    const { orderId, status } = await req.json();
+    const { orderId, status , adminNotes } = await req.json();
 
     if (!orderId || !status) {
       return NextResponse.json({
@@ -35,6 +35,7 @@ export async function PUT(req) {
 
     if (status === "approved" && order.status === "pending") {
       order.status = status;
+      order.adminNotes = adminNotes;
       await order.save();
       return NextResponse.json({
         message: "Order status updated to approved",
@@ -43,7 +44,9 @@ export async function PUT(req) {
         data: order,
       });
     } else if (status === "rejected" && order.status === "pending") {
-      await order.deleteOne();
+      order.status = "rejected";
+      order.adminNotes = adminNotes;
+      order.save();
       return NextResponse.json({
         message: "Order rejected and deleted",
         status: 200,

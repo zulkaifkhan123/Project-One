@@ -1,4 +1,3 @@
-import React from "react";
 
 export function EmailTemplate({ username, verification_code, status }) {
   return (

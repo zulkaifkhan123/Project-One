@@ -1,6 +1,3 @@
-// this is the api route for pending users to fetch in admin dashbaord
-// for aproval or rejection
-
 import { NextResponse } from "next/server";
 import dbConnection from "../../../lib/Connection";
 import User from "../../../models/User";
@@ -8,23 +5,38 @@ import User from "../../../models/User";
 export async function GET(req) {
   try {
     await dbConnection();
-    const pendingUsers = await User.find({ account_status: "pending" });
-    if (!pendingUsers) {
+
+    // Use .lean() to return plain JS objects instead of Mongoose Documents
+    let pendingUsers = await User.find({ account_status: "pending" }).lean();
+
+    if (!pendingUsers || pendingUsers.length === 0) {
       return NextResponse.json({
-        message: "No Pending User",
-        status: 205,
+        success: false,
+        message: "No pending users found",
+        status: 404,
+        data: [],
       });
     }
+
+    // ✅ Do NOT encode URLs in base64. Just return them directly.
+    pendingUsers = pendingUsers.map(user => ({
+      ...user,
+      tax_id: user.tax_id || null,                 // Cloudinary secure_url
+      business_licence: user.business_licence || null, // Cloudinary secure_url
+    }));
+
     return NextResponse.json({
-      users: pendingUsers,
-      message: "Successfully get pending users",
+      success: true,
+      message: "Successfully fetched pending users",
       status: 200,
+      data: pendingUsers,
     });
   } catch (error) {
     return NextResponse.json({
-      message:
-        "Internet Server Error / Failed api call of getting users (pending )",
-      status: 205,
+      success: false,
+      message: "Internal Server Error: " + error.message,
+      status: 500,
+      data: [],
     });
   }
 }
