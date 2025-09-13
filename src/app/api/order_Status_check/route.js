@@ -16,11 +16,12 @@ export async function GET(req) {
     }
 
     const order = await Order.findOne({
-      user: userId,
-      status: { $in: ["pending", "approved" , "rejected"] },
-    })
-      .populate("items.products") 
-      .sort({ createdAt: -1 });
+  user: userId,
+  status: { $in: ["pending", "approved", "rejected"] },
+})
+  .populate({ path: "items.products", strictPopulate: false }) // <--- add strictPopulate
+  .sort({ createdAt: -1 });
+
 
     if (!order) {
       return NextResponse.json({
