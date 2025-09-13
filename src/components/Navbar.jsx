@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 
 function Navbar() {
-  const router = useRouter();
   const pathname = usePathname() || "/";
   const { data: session } = useSession();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,10 +27,15 @@ function Navbar() {
   return (
     <nav className="p-4 shadow-sm bg-white relative z-50">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
         <h1 className="text-black text-2xl font-bold">Wholesale Store</h1>
 
-        {/* Desktop Menu */}
+        <button
+          className="md:hidden ml-3"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          <Menu size={28} />
+        </button>
+
         <div className="hidden md:flex space-x-6 items-center">
           {navLinks.map((link) => (
             <Link
@@ -46,21 +50,17 @@ function Navbar() {
               {link.label}
             </Link>
           ))}
-        </div>
-
-        {/* Auth Buttons */}
-        <div className="flex items-center space-x-4">
           {session?.user ? (
             <>
               <Link
                 href="/profile"
-                className="font-medium text-gray-500 hover:text-gray-900"
+                className="font-semibold text-black hover:text-gray-900"
               >
                 Profile
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="font-medium cursor-pointer text-gray-500 hover:text-gray-900"
+                className="font-semibold cursor-pointer text-black hover:text-gray-900"
               >
                 Logout
               </button>
@@ -82,59 +82,74 @@ function Navbar() {
             </>
           )}
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden ml-3"
-          onClick={() => setIsSidebarOpen(true)}
-        >
-          <Menu size={28} />
-        </button>
       </div>
 
-      {/* Sidebar + Overlay */}
+      {/* Sidebar */}
       <div
-        className={`fixed inset-0 z-40 transition-opacity duration-300 ${
-          isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`fixed top-[64px] right-0 h-full w-72 bg-white text-black shadow-lg z-40 transform transition-transform duration-500 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Dark overlay */}
-        <div
-          className="absolute inset-0 bg-black/50"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-
-        {/* Sidebar */}
-        <div
-          className={`absolute right-0 top-[64px] h-[calc(100%-64px)] w-3/4 sm:w-1/2 
-                      bg-gray-900 shadow-xl p-6 flex flex-col transform transition-transform duration-300 
-                      ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}
-        >
-          {/* Close Button */}
+        <div className="flex flex-col p-6 space-y-6">
           <button
-            className="self-end mb-6 text-white"
+            className="self-end mb-4"
             onClick={() => setIsSidebarOpen(false)}
           >
             <X size={28} />
           </button>
 
-          {/* Nav Links */}
-          <div className="flex flex-col space-y-4">
-            {navLinks.map((link) => (
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsSidebarOpen(false)}
+              className={`block font-medium text-lg md:text-xl lg:text-2xl ${
+                isActive(link.href)
+                  ? "text-black font-semibold"
+                  : "text-gray-700 hover:text-black"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          {session?.user ? (
+            <>
               <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsSidebarOpen(false)} // close on click
-                className={`block font-medium text-lg px-2 py-2 rounded transition-colors ${
-                  isActive(link.href)
-                    ? "text-white bg-gray-700"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800"
-                }`}
+                href="/profile"
+                onClick={() => setIsSidebarOpen(false)}
+                className="block font-semibold text-lg md:text-xl lg:text-2xl text-black hover:text-gray-900 bg-gray-100 px-3 py-2 rounded"
               >
-                {link.label}
+                Profile
               </Link>
-            ))}
-          </div>
+              <button
+                onClick={() => {
+                  signOut({ callbackUrl: "/" });
+                  setIsSidebarOpen(false);
+                }}
+                className="block text-left font-semibold text-lg md:text-xl lg:text-2xl text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setIsSidebarOpen(false)}
+                className="block font-medium text-lg md:text-xl lg:text-2xl text-gray-700 hover:text-black"
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setIsSidebarOpen(false)}
+                className="block font-medium text-lg md:text-xl lg:text-2xl text-gray-700 hover:text-black"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
