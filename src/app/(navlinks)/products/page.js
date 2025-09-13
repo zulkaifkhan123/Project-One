@@ -30,9 +30,8 @@ export default function ProductsPage() {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [availability, setAvailability] = useState("");
 
-  // ✅ Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 6; // show 6 per page
+  const productsPerPage = 9; // show 6 per page
 
   const router = useRouter();
 

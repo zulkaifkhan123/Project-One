@@ -38,7 +38,6 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Automatically generate slug from productName
 ProductSchema.pre("validate", function (next) {
   if (this.productName) {
     this.slug = slugify(this.productName, { lower: true, strict: true });

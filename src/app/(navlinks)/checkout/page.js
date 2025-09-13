@@ -5,12 +5,14 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null);
+  const router = useRouter();
 
   const {
     data: orders,
@@ -75,7 +77,8 @@ export default function CheckoutPage() {
       );
     } finally {
       setLoading(false);
-      setReceiptFile(null); // Clear file input after submission
+      setReceiptFile(null); 
+      router.push("/products")
     }
   }
 

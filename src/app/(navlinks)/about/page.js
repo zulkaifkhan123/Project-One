@@ -1,3 +1,4 @@
+'use client'
 import {
   Building,
   Globe,
@@ -12,8 +13,11 @@ import {
   Shield,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 
 export default function AboutUs() {
+  const router = useRouter();
   return (
     <div className="w-full bg-white text-gray-800">
       {/* Hero */}
@@ -49,9 +53,9 @@ export default function AboutUs() {
           </p>
         </div>
         <div className="flex justify-center">
-          <div className="bg-gray-100 p-10 rounded-2xl">
+          <div className="rounded-2xl">
             <Image
-              src="/about.png"
+              src="/aboutUs.webp"
               alt="Our Journey"
               width={400}
               height={300}
@@ -193,7 +197,9 @@ export default function AboutUs() {
           authentic products, seamless operations, and long-term growth opportunities. 
           We believe in partnerships built on trust, transparency, and success.
         </p>
-        <button className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors duration-200">
+        <button 
+        onClick={() => router.push('/products')}
+        className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors duration-200">
           Get Started Today <ArrowRight size={18} />
         </button>
       </section>

@@ -23,7 +23,6 @@ const BrandSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-BrandSchema.index({ brandName: 1 });
 
 const Brand = models.Brand || model("Brand", BrandSchema);
 

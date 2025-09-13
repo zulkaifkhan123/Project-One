@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import dbConnection from "../../../lib/Connection";
 import Receipt from "../../../models/Recepit";
-import User from "../../../models/User"
+import User from "../../../models/User";
 import Order from "../../../models/Order";
 import Cart from "../../../models/Cart";
+import Product from "../../../models/Product";
 
 export async function POST(req) {
   try {
@@ -18,10 +19,12 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
     const order = await Order.findById(orderId);
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
+
     order.status = "paid";
     await order.save();
 
@@ -29,11 +32,23 @@ export async function POST(req) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
     const cart = await Cart.findOne({ user: userId });
     if (cart) {
       cart.items = [];
       await cart.save();
     }
+
+    if (Array.isArray(order.items)) {
+      for (const item of order.items) {
+        if (item.products) {
+          await Product.findByIdAndUpdate(item.products, {
+            $inc: { productQuantity: -item.quantity },
+          });
+        }
+      }
+    }
+
     const receipt = await Receipt.create({
       userId,
       orderId,
@@ -41,20 +56,17 @@ export async function POST(req) {
       status: "paid",
     });
 
-
-    
-
     return NextResponse.json(
       { message: "Receipt saved successfully", receipt },
       { status: 200 }
     );
+
   } catch (err) {
     console.error("Error saving receipt:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
-// ✅ GET receipts
 export async function GET(req) {
   try {
     await dbConnection();
