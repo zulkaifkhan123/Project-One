@@ -1,7 +1,10 @@
 // app/api/upload_recepit/route.js
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
