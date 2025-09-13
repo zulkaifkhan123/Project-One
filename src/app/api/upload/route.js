@@ -8,18 +8,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-function bufferToStream(buffer) {
-  const { Readable } = require("stream");
-  const readable = new Readable();
-  readable.push(buffer);
-  readable.push(null);
-  return readable;
-}
-
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const files = formData.getAll("productImage"); 
+    const files = formData.getAll("productImage");
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
@@ -29,23 +21,20 @@ export async function POST(req) {
       const buffer = Buffer.from(await file.arrayBuffer());
 
       return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { resource_type: "raw", folder: "products" },
+        cloudinary.uploader.upload_stream(
+          { resource_type: "auto", folder: "products" },
           (error, result) => {
             if (error) reject(error);
             else resolve(result.secure_url);
           }
-        );
-        bufferToStream(buffer).pipe(uploadStream);
+        ).end(buffer);   // ✅ directly end with buffer (no custom stream)
       });
     });
 
     const urls = await Promise.all(uploadPromises);
-
     return NextResponse.json({ urls }, { status: 200 });
   } catch (err) {
     console.error("Upload error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
