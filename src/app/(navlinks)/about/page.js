@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 export default function AboutUs() {
   const router = useRouter();
   return (
-    <div className="w-full bg-white text-gray-800">
+    <div className="w-full bg-white text-gray-700">
       {/* Hero */}
       <section className="py-24 px-6 text-center border-b border-gray-200">
         <h1 className="text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
