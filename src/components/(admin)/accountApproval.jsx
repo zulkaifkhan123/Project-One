@@ -22,7 +22,6 @@ export default function AccountApproval() {
     },
   });
 
-  // ✅ Single mutation for approve/suspend (directly updates status)
   const updateStatusMutation = useMutation({
     mutationFn: async ({ userId, status }) => {
       const res = await axios.put("/api/changeStatus", { userId, status });
