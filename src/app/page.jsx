@@ -126,7 +126,7 @@ export default function HomePage() {
                   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition cursor-pointer overflow-hidden group"
                 >
                   {/* Product Image */}
-                  <div className="relative w-full h-56">
+                  <div className="relative w-full h-45">
                     {product.productImage?.length > 0 && (
                       <Image
                         src={product.productImage[0]}

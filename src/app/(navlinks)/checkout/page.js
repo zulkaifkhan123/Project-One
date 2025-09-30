@@ -46,7 +46,6 @@ export default function CheckoutPage() {
       const formData = new FormData();
       formData.append("receipt_image", receiptFile);
 
-      // 1. Upload to Cloudinary
       const uploadRes = await axios.post("/api/upload_receipt", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -57,7 +56,6 @@ export default function CheckoutPage() {
 
       const receiptUrl = uploadRes.data.url;
 
-      // 2. Save receipt record (only runs if upload succeeded)
       await axios.post("/api/store-receipt", {
         orderId,
         userId: session?.user?.id,
@@ -77,8 +75,8 @@ export default function CheckoutPage() {
       );
     } finally {
       setLoading(false);
-      setReceiptFile(null); 
-      router.push("/products")
+      setReceiptFile(null);
+      router.push("/products");
     }
   }
 
@@ -93,27 +91,29 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 relative z-10">
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 relative z-10">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+        Checkout
+      </h1>
 
       {orders.map((order) => (
         <div key={order._id} className="mb-10">
           {/* Products */}
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {order.items.map((item) => (
               <div
                 key={item._id}
-                className="flex items-center gap-6 border rounded-2xl p-4 shadow-sm"
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border rounded-2xl p-4 shadow-sm"
               >
                 <Image
                   src={item.products.productImage[0]}
                   alt={item.products.productName}
                   width={100}
                   height={100}
-                  className="rounded-lg object-cover"
+                  className="rounded-lg object-contain w-full sm:w-[100px] h-[180px] sm:h-[100px]"
                 />
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold">
+                  <h2 className="text-base sm:text-lg font-semibold">
                     {item.products.productName}
                   </h2>
                   <p className="text-sm text-gray-600 line-clamp-2">
@@ -124,7 +124,7 @@ export default function CheckoutPage() {
                     <span className="font-medium">{item.quantity}</span>
                   </p>
                 </div>
-                <p className="text-lg font-bold">
+                <p className="text-base sm:text-lg font-bold">
                   ${item.products.productPrice}
                 </p>
               </div>
@@ -132,24 +132,26 @@ export default function CheckoutPage() {
           </div>
 
           {/* Totals */}
-          <div className="mt-6 p-6 border rounded-2xl shadow-md bg-gray-50">
-            <div className="flex justify-between mb-2 text-lg">
+          <div className="mt-6 p-4 sm:p-6 border rounded-2xl shadow-md bg-gray-50">
+            <div className="flex justify-between mb-2 text-base sm:text-lg">
               <span>Subtotal</span>
               <span>${order.totalAmount}</span>
             </div>
-            <div className="flex justify-between font-bold text-xl border-t pt-2">
+            <div className="flex justify-between font-bold text-lg sm:text-xl border-t pt-2">
               <span>Total</span>
               <span>${order.totalAmount}</span>
             </div>
           </div>
 
           {/* Bank Details & Contact */}
-          <div className="mt-8 p-6 border rounded-2xl shadow-md bg-white">
-            <h2 className="text-xl font-semibold mb-4">Payment Instructions</h2>
-            <p className="mb-2">
+          <div className="mt-8 p-4 sm:p-6 border rounded-2xl shadow-md bg-white">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Payment Instructions
+            </h2>
+            <p className="mb-2 text-sm sm:text-base">
               Please transfer the total amount to the following bank account:
             </p>
-            <ul className="mb-4 space-y-1 text-gray-700">
+            <ul className="mb-4 space-y-1 text-gray-700 text-sm sm:text-base">
               <li>
                 <strong>Bank Name:</strong> ABC Bank
               </li>
@@ -166,7 +168,7 @@ export default function CheckoutPage() {
                 <strong>SWIFT Code:</strong> ABCDPKKA
               </li>
             </ul>
-            <p className="mb-2">
+            <p className="mb-2 text-sm sm:text-base">
               After payment, kindly share the receipt with us.
             </p>
 
@@ -178,7 +180,7 @@ export default function CheckoutPage() {
                 handleUpload(order._id);
               }}
             >
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2 font-medium text-sm sm:text-base">
                 Upload Receipt Screenshot
               </label>
               <input
@@ -186,24 +188,26 @@ export default function CheckoutPage() {
                 required
                 accept="image/*"
                 onChange={(e) => setReceiptFile(e.target.files[0])}
-                className="mr-5 mb-4 border border-gray-300 rounded-lg px-3 py-2 
+                className="block w-full text-sm mb-4 border border-gray-300 rounded-lg px-3 py-2 
                            focus:outline-none focus:ring-2 focus:ring-black 
-                           file:mr-4 file:py-2 file:px-4 file:rounded-lg 
+                           file:mr-2 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-2 sm:file:px-4 file:rounded-lg 
                            file:border-0 file:bg-black file:text-white 
                            file:cursor-pointer hover:file:bg-gray-900"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow 
-                           hover:bg-blue-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg shadow 
+                           hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? "Uploading..." : "Upload Receipt"}
               </button>
             </form>
 
-            <h3 className="text-lg font-semibold mt-6 mb-2">Contact Details</h3>
-            <ul className="space-y-1 text-gray-700">
+            <h3 className="text-base sm:text-lg font-semibold mt-6 mb-2">
+              Contact Details
+            </h3>
+            <ul className="space-y-1 text-gray-700 text-sm sm:text-base">
               <li>
                 <strong>Email:</strong> admin@example.com
               </li>

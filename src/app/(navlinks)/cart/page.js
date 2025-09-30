@@ -76,7 +76,7 @@ export default function CartPage() {
     },
   });
 
-  // ✅ Cancel order mutation (moved up here!)
+  // ✅ Cancel order mutation
   const cancelOrderMutation = useMutation({
     mutationFn: async () => {
       const res = await axios.delete(
@@ -133,12 +133,15 @@ export default function CartPage() {
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Cart items */}
-      <div className="lg:col-span-2 space-y-6">
+      <div className="lg:col-span-2 space-y-6 w-full">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Shopping Cart</h1>
         <div className="bg-white rounded-xl shadow-md divide-y">
           {cart.items.map((item) => (
-            <div key={item._id} className="flex flex-col md:flex-row gap-6 p-6">
-              <div className="w-full md:w-40 h-40 relative flex-shrink-0">
+            <div
+              key={item._id}
+              className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6 w-full"
+            >
+              <div className="w-full sm:w-40 h-40 relative flex-shrink-0">
                 {item.product?.productImage?.[0] && (
                   <Image
                     src={item.product.productImage[0]}
@@ -170,7 +173,7 @@ export default function CartPage() {
               {!order && (
                 <button
                   onClick={() => removeMutation.mutate(item.product?._id)}
-                  className="text-red-500 hover:text-red-700 cursor-pointer transition flex items-center"
+                  className="text-red-500 hover:text-red-700 transition flex items-center sm:self-start"
                 >
                   <Trash2 size={20} className="mr-1" /> Remove
                 </button>
@@ -181,8 +184,8 @@ export default function CartPage() {
       </div>
 
       {/* Order Summary */}
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 sticky top-20">
+      <div className="space-y-6 w-full">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 sticky top-20">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
             Order Summary
           </h2>
@@ -199,7 +202,7 @@ export default function CartPage() {
 
             {order?.status === "approved" ? (
               <button
-                className="mt-6 w-full text-gray-900 font-semibold py-3 rounded-lg shadow transition bg-yellow-500 hover:bg-yellow-600 cursor-pointer"
+                className="mt-6 w-full text-gray-900 font-semibold py-3 rounded-lg shadow transition bg-yellow-500 hover:bg-yellow-600"
                 onClick={() => router.push("/checkout")}
               >
                 Checkout
@@ -210,10 +213,10 @@ export default function CartPage() {
                   !!order || totalPrice < 1000 || orderMutation.isLoading
                 }
                 onClick={() => orderMutation.mutate()}
-                className={`mt-6 w-full text-gray-900 font-semibold py-3 rounded-lg shadow transition ${
+                className={`mt-6 w-full font-semibold py-3 rounded-lg shadow transition ${
                   !order && totalPrice >= 1000
-                    ? "bg-yellow-500 hover:bg-yellow-600 cursor-pointer"
-                    : "bg-gray-300 cursor-not-allowed"
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-gray-900"
+                    : "bg-gray-300 cursor-not-allowed text-gray-700"
                 }`}
                 title={
                   order
@@ -240,7 +243,7 @@ export default function CartPage() {
           </div>
 
           {/* Order Status */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+          <div className="rounded-xl mt-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               Order Status
             </h2>
@@ -257,7 +260,7 @@ export default function CartPage() {
                   </p>
                 )}
                 <button
-                  className="mt-6 w-full text-white font-semibold py-3 rounded-lg shadow transition bg-red-500 hover:bg-red-600 cursor-pointer"
+                  className="mt-6 w-full text-white font-semibold py-3 rounded-lg shadow transition bg-red-500 hover:bg-red-600"
                   onClick={() => cancelOrderMutation.mutate()}
                   disabled={cancelOrderMutation.isPending}
                 >

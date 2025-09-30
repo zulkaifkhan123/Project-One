@@ -11,7 +11,6 @@ export default function OrderApproval() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  // ✅ Fetch all pending orders
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
@@ -19,15 +18,13 @@ export default function OrderApproval() {
 
       if (res.data?.success) {
         toast.success(res.data.message || "Orders fetched");
-        console.log("Fetched orders:", res.data.data);
         return res.data.data || [];
       }
 
       toast.error(res.data?.message || "Failed to fetch orders");
-      console.error("Error fetching orders:", res.data?.message);
       return [];
     },
-    enabled: !!session?.user, // fetch only if logged in
+    enabled: !!session?.user,
   });
 
   // ✅ Mutation for updating order status
@@ -42,7 +39,7 @@ export default function OrderApproval() {
     },
     onSuccess: (data) => {
       toast.success(data.message || "Order updated successfully");
-      queryClient.invalidateQueries(["orders"]); // refresh list
+      queryClient.invalidateQueries(["orders"]);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Error updating order");
@@ -64,13 +61,13 @@ export default function OrderApproval() {
   }
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="md:p-6 min-h-screen">
       {/* Heading */}
-      <div className="mb-8">
-        <h1 className="text-xl font-bold text-gray-900">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-lg md:text-xl font-bold text-gray-900">
           Approve or Reject Orders
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-2 text-sm md:text-base">
           Review, approve, or reject pending orders and add any necessary admin
           notes.
         </p>
@@ -80,7 +77,7 @@ export default function OrderApproval() {
       {orders.length === 0 ? (
         <p className="text-gray-500 text-center">No pending orders to review.</p>
       ) : (
-        <div className="space-y-8 flex flex-col items-center">
+        <div className="space-y-6 md:space-y-8 flex flex-col items-center">
           {orders.map((order) => (
             <OrderCard
               key={order._id}
@@ -111,18 +108,18 @@ function OrderCard({ order, onAction }) {
   };
 
   return (
-    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition">
+    <div className="w-full max-w-5xl bg-white rounded-xl md:rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition">
       {/* Header */}
-      <div className="p-5 flex justify-between items-start border-b border-gray-200">
+      <div className="p-4 md:p-5 flex flex-col md:flex-row md:justify-between md:items-start gap-3 border-b border-gray-200">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-900">
             Order #{order._id?.slice(-6) || "N/A"}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
             Customer Email:{" "}
             <span className="font-medium">{order.user?.email || "Unknown"}</span>
           </p>
-          <p className="text-sm text-gray-400 mt-0.5">
+          <p className="text-xs md:text-sm text-gray-400 mt-0.5">
             Placed on{" "}
             {order.createdAt
               ? new Date(order.createdAt).toLocaleDateString()
@@ -130,7 +127,7 @@ function OrderCard({ order, onAction }) {
           </p>
         </div>
         <span
-          className={`px-4 py-1 text-sm font-medium rounded-full ${
+          className={`self-start md:self-center px-3 md:px-4 py-1 text-xs md:text-sm font-medium rounded-full ${
             statusColors[order.status] || ""
           }`}
         >
@@ -139,23 +136,31 @@ function OrderCard({ order, onAction }) {
       </div>
 
       {/* Items Table */}
-      <div className="p-5">
-        <h3 className="font-medium text-gray-800 mb-3">Ordered Items</h3>
-        <div className="grid grid-cols-12 gap-3 text-gray-700 text-sm font-medium border-b pb-2">
+      <div className="p-4 md:p-5">
+        <h3 className="font-medium text-gray-800 mb-3 text-sm md:text-base">
+          Ordered Items
+        </h3>
+
+        {/* Table Header (desktop only) */}
+        <div className="hidden md:grid grid-cols-12 gap-3 text-gray-700 text-sm font-medium border-b pb-2">
           <div className="col-span-6">Product</div>
           <div className="col-span-3 text-center">Qty</div>
           <div className="col-span-3 text-right">Price</div>
         </div>
+
+        {/* Items */}
         {order.items?.map((item, idx) => (
           <div
             key={idx}
-            className="grid grid-cols-12 gap-3 py-2 text-gray-600 border-b border-gray-100"
+            className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3 py-2 text-gray-600 border-b border-gray-100 text-sm"
           >
-            <div className="col-span-6">
+            <div className="col-span-1 md:col-span-6">
               {item.products?.productName || "Unknown Product"}
             </div>
-            <div className="col-span-3 text-center">{item.quantity}</div>
-            <div className="col-span-3 text-right">
+            <div className="col-span-1 md:col-span-3 text-center">
+              {item.quantity}
+            </div>
+            <div className="col-span-2 md:col-span-3 text-right font-medium">
               $
               {item.products?.productPrice
                 ? item.products.productPrice * item.quantity
@@ -163,13 +168,14 @@ function OrderCard({ order, onAction }) {
             </div>
           </div>
         ))}
-        <div className="flex justify-end font-semibold text-gray-900 mt-3">
+
+        <div className="flex justify-end font-semibold text-gray-900 mt-3 text-sm md:text-base">
           Total: ${order.totalAmount || 0}
         </div>
       </div>
 
       {/* Admin Notes & Actions */}
-      <div className="p-5 flex flex-col md:flex-row md:justify-between gap-4 md:items-center border-t">
+      <div className="p-4 md:p-5 flex flex-col md:flex-row md:justify-between gap-4 md:items-center border-t">
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -177,16 +183,16 @@ function OrderCard({ order, onAction }) {
           placeholder="Add admin notes..."
           rows={2}
         />
-        <div className="flex gap-3 md:gap-4">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
           <button
             onClick={() => onAction("approved", notes)}
-            className="flex items-center gap-2 px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold"
+            className="flex items-center justify-center gap-2 w-full md:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold text-sm md:text-base"
           >
             <CheckCircle size={18} /> Approve
           </button>
           <button
             onClick={() => onAction("rejected", notes)}
-            className="flex items-center gap-2 px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold"
+            className="flex items-center justify-center gap-2 w-full md:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold text-sm md:text-base"
           >
             <XCircle size={18} /> Reject
           </button>
