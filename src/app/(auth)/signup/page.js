@@ -26,48 +26,108 @@ export default function RegistrationPage() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    try {
-      setLoading(true);
+  try {
+    console.log("➡️ Signup form submitted with data:", data);
+    setLoading(true);
 
-      const formData = new FormData();
-      if (data.tax_id?.[0]) formData.append("tax_id", data.tax_id[0]);
-      if (data.business_licence?.[0])
-        formData.append("business_licence", data.business_licence[0]);
-
-      const uploadRes = await axios.post("/api/signup_uploads", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (!uploadRes.data) throw new Error("Upload failed - no response data");
-
-      const { taxIdUrl, licenseUrl } = uploadRes.data;
-
-      const signupRes = await axios.post("/api/signup", {
-        ...data,
-        tax_id: taxIdUrl,
-        business_licence: licenseUrl,
-      });
-
-      const responseData = signupRes.data;
-      console.log("Signup response data:", responseData);
-
-      if (responseData?.success === true) {
-        toast.success(responseData.message, { duration: 4000 });
-
-        const username = responseData?.user?.username || data.username;
-        reset();
-        router.push(`/email-verification/${encodeURIComponent(username)}`);
-      } else {
-        console.log("Signup Failed:", responseData);
-        toast.error(responseData.message || "Signup failed. Please try again.");
-      }
-    } catch (err) {
-      console.error("Signup error:", err.response?.data || err.message);
-      toast.error("Signup failed. Please try again.");
-    } finally {
-      setLoading(false);
+    const formData = new FormData();
+    if (data.tax_id?.[0]) {
+      console.log("📂 Attaching tax_id file:", data.tax_id[0].name);
+      formData.append("tax_id", data.tax_id[0]);
     }
-  };
+    if (data.business_licence?.[0]) {
+      console.log("📂 Attaching business_licence file:", data.business_licence[0].name);
+      formData.append("business_licence", data.business_licence[0]);
+    }
+
+    console.log("⬆️ Sending formData to /api/signup_uploads ...");
+
+    const uploadRes = await axios.post("/api/signup_uploads", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log("✅ Upload API response:", uploadRes);
+
+    if (!uploadRes.data) throw new Error("Upload failed - no response data");
+
+    const { taxIdUrl, licenseUrl } = uploadRes.data;
+    console.log("✅ Received uploaded file URLs:", { taxIdUrl, licenseUrl });
+
+    console.log("⬆️ Sending signup request with uploaded URLs...");
+
+    const signupRes = await axios.post("/api/signup", {
+      ...data,
+      tax_id: taxIdUrl,
+      business_licence: licenseUrl,
+    });
+
+    const responseData = signupRes.data;
+    console.log("✅ Signup API response:", responseData);
+
+    if (responseData?.success === true) {
+      toast.success(responseData.message, { duration: 4000 });
+
+      const username = responseData?.user?.username || data.username;
+      reset();
+      console.log("➡️ Redirecting to verification page for:", username);
+      router.push(`/email-verification/${encodeURIComponent(username)}`);
+    } else {
+      console.warn("⚠️ Signup Failed:", responseData);
+      toast.error(responseData.message || "Signup failed. Please try again.");
+    }
+  } catch (err) {
+    console.error("❌ Signup error:", err.response?.data || err.message, err);
+    toast.error("Signup failed. Please try again.");
+  } finally {
+    setLoading(false);
+    console.log("⏹️ Signup process finished, loading reset.");
+  }
+};
+
+
+  // const onSubmit = async (data) => {
+  //   try {
+  //     setLoading(true);
+
+  //     const formData = new FormData();
+  //     if (data.tax_id?.[0]) formData.append("tax_id", data.tax_id[0]);
+  //     if (data.business_licence?.[0])
+  //       formData.append("business_licence", data.business_licence[0]);
+
+  //     const uploadRes = await axios.post("/api/signup_uploads", formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     if (!uploadRes.data) throw new Error("Upload failed - no response data");
+
+  //     const { taxIdUrl, licenseUrl } = uploadRes.data;
+
+  //     const signupRes = await axios.post("/api/signup", {
+  //       ...data,
+  //       tax_id: taxIdUrl,
+  //       business_licence: licenseUrl,
+  //     });
+
+  //     const responseData = signupRes.data;
+  //     console.log("Signup response data:", responseData);
+
+  //     if (responseData?.success === true) {
+  //       toast.success(responseData.message, { duration: 4000 });
+
+  //       const username = responseData?.user?.username || data.username;
+  //       reset();
+  //       router.push(`/email-verification/${encodeURIComponent(username)}`);
+  //     } else {
+  //       console.log("Signup Failed:", responseData);
+  //       toast.error(responseData.message || "Signup failed. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Signup error:", err.response?.data || err.message);
+  //     toast.error("Signup failed. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div className="flex items-center justify-center py-1 bg-white text-black">
