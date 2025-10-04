@@ -31,7 +31,7 @@ export async function POST(request) {
       !billing_address ||
       !shipping_address
     ) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "All required fields must be provided" },
         { status: 400 }
       );
@@ -39,14 +39,14 @@ export async function POST(request) {
 
     const emailRegex = /^\S+@\S+\.\S+$/;
     if (!emailRegex.test(email)) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Invalid email format" },
         { status: 400 }
       );
     }
 
     if (password.length < 8) {
-      return Response.json(
+      return NextResponse.json(
         {
           success: false,
           message: "Password must be at least 8 characters long",
@@ -57,7 +57,7 @@ export async function POST(request) {
 
     const phoneRegex = /^\+?[0-9]{7,15}$/;
     if (!phoneRegex.test(phone_number)) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Invalid phone number format" },
         { status: 400 }
       );
@@ -68,7 +68,7 @@ export async function POST(request) {
 
     if (existingUserByEmail) {
       if (existingUserByEmail.isVerified) {
-        return Response.json(
+        return NextResponse.json(
           { success: false, message: "User already exists with this email" },
           { status: 400 }
         );
@@ -95,13 +95,13 @@ export async function POST(request) {
         );
 
         if (!emailResponse.success) {
-          return Response.json(
+          return NextResponse.json(
             { success: false, message: emailResponse.message },
             { status: 500 }
           );
         }
 
-        return Response.json(
+        return NextResponse.json(
           {
             success: true,
             message: "Verification code resent. Please check your email.",
@@ -141,7 +141,7 @@ export async function POST(request) {
       );
 
       if (!emailResponse.success) {
-        return Response.json(
+        return NextResponse.json(
           { success: false, message: emailResponse.message },
           { status: 500 }
         );
@@ -158,7 +158,7 @@ export async function POST(request) {
     }
   } catch (error) {
     console.error("Error registering user:", error);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Error registering user" },
       { status: 500 }
     );
