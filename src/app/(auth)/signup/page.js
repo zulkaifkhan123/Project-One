@@ -42,9 +42,7 @@ export default function RegistrationPage() {
 
     console.log("⬆️ Sending formData to /api/signup_uploads ...");
 
-    const uploadRes = await axios.post("/api/signup_uploads", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const uploadRes = await axios.post("/api/signup_uploads", formData);
 
     console.log("✅ Upload API response:", uploadRes);
 
